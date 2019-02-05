@@ -1,0 +1,5 @@
+Gemfile.lock
+.bundle/
+vendor/
+conf/config.yml
+slack-kurobot.zip

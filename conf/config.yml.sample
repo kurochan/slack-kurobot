@@ -1,0 +1,15 @@
+---
+
+team_config:
+  - team_id: AAAAAAAA
+    _slack_access_token: abcd-efgh-ijkl
+    enabled_commands: 
+      - name: debug
+        allowed_users: [A12AABBCC]
+        allowed_channels: [B12AABBCC]
+        denied_channels: []
+        denied_users: []
+        debug_all_event: true
+      - name: echo
+        allowed_users: [all]
+        allowed_channels: [D12AABBCC]
