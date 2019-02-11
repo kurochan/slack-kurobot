@@ -45,17 +45,11 @@ module SlackBot
 
           message = <<"EOS"
 config:
-```
-#{mask_secret_config(context.config).pretty_inspect}
-```
-message:
-```
-#{context.message.pretty_inspect}
-```
-lambda_event:
-```
-#{context.lambda_event.pretty_inspect}
-```
+```#{mask_secret_config(context.config).pretty_inspect}```
+commands:
+```#{context.allowed_commands.keys.pretty_inspect}```
+message: ```#{context.message.pretty_inspect}```
+lambda_event: ```#{context.lambda_event.pretty_inspect}```
 EOS
           message.gsub!(ENV['API_KEY'], "_MASKED_")
           context.client.chat_postMessage(channel: context.message['event']['channel'], text: message, as_user: true, thread_ts:  context.message['event']['thread_ts'] || context.message['event']['ts'])
@@ -63,10 +57,7 @@ EOS
         else
 
           message = <<"EOS"
-debug message:
-```
-#{context.message.pretty_inspect}
-```
+debug message: ```#{context.message.pretty_inspect}```
 EOS
           context.client.chat_postMessage(channel: context.message['event']['channel'], text: message, as_user: true)
         end

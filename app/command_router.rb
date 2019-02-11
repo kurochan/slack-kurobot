@@ -28,6 +28,7 @@ module SlackBot
 
         context.allowed_commands.each do |name, command|
           if command.can_handle?(context: context)
+            context.logger.debug("handle: #{name}")
             command.handle(context: context)
             break unless command.pass_through?(context: context)
           end
