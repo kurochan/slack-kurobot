@@ -16,9 +16,9 @@ module SlackBot
 
       def handle(context:)
 
-        context.logger.debug("Message: #{context.message}")
+        context.logger.debug("message: #{context.message}")
 
-        return nil if context.message['authed_users'].include?(context.message['event']['user'])
+        return nil if context.message['authed_users'].include?(context.message['event']['user']) || context.message['event']['user'].nil? || context.message['event']['user'].empty?
 
         allowed_commands = get_allowed_command_configs(context).map do |config|
           [config.name, @@commands[config.name]]

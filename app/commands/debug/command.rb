@@ -10,7 +10,8 @@ module SlackBot
 
       def can_handle?(context:)
         context.config.enabled_commands.find {|command| command.name == 'debug' }.debug_all_event ||
-        (context.message['event']['type'] == 'app_mention' && /^<.*?> *debug/.match?(context.message['event']['text']))
+        (context.message['event']['type'] == 'app_mention' && /^<.*?> *debug/.match?(context.message['event']['text'])) ||
+        (context.message['event']['channel_type'] == 'im' && /^ *debug/.match?(context.message['event']['text']))
       end
 
       def pass_through?(context:)
@@ -39,7 +40,8 @@ module SlackBot
 
       def handle(context:)
 
-        if context.message['event']['type'] == 'app_mention' && /^<.*?> *debug/.match?(context.message['event']['text'])
+        if (context.message['event']['type'] == 'app_mention' && /^<.*?> *debug/.match?(context.message['event']['text'])) ||
+           (context.message['event']['channel_type'] == 'im' && /^ *debug/.match?(context.message['event']['text']))
 
           message = <<"EOS"
 config:
