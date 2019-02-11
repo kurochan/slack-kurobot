@@ -1,3 +1,4 @@
+require 'aws-sdk-dynamodb'
 require 'hashie'
 require 'slack-ruby-client'
 require_relative 'models/context'
@@ -20,9 +21,18 @@ module SlackBot
 
       config = @config_all.team_config.find {|config| config.team_id == body['team_id'] }
 
+      dynamodb = Aws::DynamoDB::Resource.new(region: @config_all.dynamodb_table.region).table(@config_all.dynamodb_table.name)
       client = Slack::Web::Client.new(token: config._slack_access_token)
 
-      context = SlackBot::Model::Context.new(logger: logger, config: config, lambda_event: lambda_event, lambda_context: lambda_context, client: client, message: body)
+      context = SlackBot::Model::Context.new(
+        logger: logger,
+        config: config,
+        lambda_event: lambda_event,
+        lambda_context: lambda_context,
+        dynamodb: dynamodb,
+        client: client,
+        message: body
+      )
 
       logger.debug("Type: #{body['type']}")
       logger.debug("Body: #{body}")

@@ -1,4 +1,5 @@
 require 'pp'
+require 'time'
 require 'yaml'
 require 'hashie'
 
@@ -18,7 +19,8 @@ module SlackBot
 
         context.logger.debug("message: #{context.message}")
 
-        return nil if context.message['authed_users'].include?(context.message['event']['user']) || context.message['event']['user'].nil? || context.message['event']['user'].empty?
+        return nil unless validate_message(context)
+        accept_message(context)
 
         allowed_commands = get_allowed_command_configs(context).map do |config|
           [config.name, @@commands[config.name]]
@@ -34,6 +36,38 @@ module SlackBot
           end
         end
       end
+
+      def item_key_prefix(context)
+        "#{context.message['team_id']}:#{context.message['event']['channel']}:#{context.message['event']['ts']}:#{context.message['event']['type']}"
+      end
+      private :item_key_prefix
+
+      def validate_message(context)
+        return false if context.message['authed_users'].include?(context.message['event']['user']) ||
+                        context.message['event']['user'].nil? ||
+                        context.message['event']['user'].empty?
+
+        item = context.dynamodb.get_item(key: {'item_key' => "#{item_key_prefix(context)}:accept"})[:item]
+        if item
+          context.logger.warn("duplicate message detected (maybe timeout): #{item}")
+          return false
+        end
+
+        true
+      end
+      private :validate_message
+
+      def accept_message(context)
+        now = Time.now
+        expire_at = now.to_i + 60 * 60
+        item = {
+          'item_key' => "#{item_key_prefix(context)}:accept",
+          'created_at' => now.to_s,
+          'ttl' => expire_at
+        }
+        context.dynamodb.put_item(item: item)
+      end
+      private :accept_message
 
       def get_allowed_command_configs(context)
         commands = context.config.enabled_commands.map do |command|
