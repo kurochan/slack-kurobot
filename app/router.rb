@@ -19,21 +19,6 @@ module SlackBot
 
       body = JSON.parse(lambda_event['body'])
 
-      config = @config_all.team_config.find {|config| config.team_id == body['team_id'] }
-
-      dynamodb = Aws::DynamoDB::Resource.new(region: @config_all.dynamodb_table.region).table(@config_all.dynamodb_table.name)
-      client = Slack::Web::Client.new(token: config._slack_access_token)
-
-      context = SlackBot::Model::Context.new(
-        logger: logger,
-        config: config,
-        lambda_event: lambda_event,
-        lambda_context: lambda_context,
-        dynamodb: dynamodb,
-        client: client,
-        message: body
-      )
-
       logger.debug("Type: #{body['type']}")
       logger.debug("Body: #{body}")
 
@@ -42,6 +27,7 @@ module SlackBot
         { statusCode: 200, body: body['challenge'] }
 
       when 'event_callback'
+        context = create_context(lambda_event, lambda_context, logger, body)
         @command_router.handle(context: context)
         { statusCode: 200, body: 'OK' }
       else
@@ -49,5 +35,24 @@ module SlackBot
         { statusCode: 200, body: 'OK' }
       end
     end
+
+    def create_context(lambda_event, lambda_context, logger, body)
+
+      config = @config_all.team_config.find {|config| config.team_id == body['team_id'] }
+
+      dynamodb = Aws::DynamoDB::Resource.new(region: @config_all.dynamodb_table.region).table(@config_all.dynamodb_table.name)
+      client = Slack::Web::Client.new(token: config._slack_access_token)
+
+      SlackBot::Model::Context.new(
+        logger: logger,
+        config: config,
+        lambda_event: lambda_event,
+        lambda_context: lambda_context,
+        dynamodb: dynamodb,
+        client: client,
+        message: body
+      )
+    end
+    private :create_context
   end
 end
