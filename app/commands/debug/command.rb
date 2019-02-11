@@ -10,8 +10,7 @@ module SlackBot
 
       def can_handle?(context:)
         context.config.enabled_commands.find {|command| command.name == 'debug' }.debug_all_event ||
-        context.message['event']['type'] == 'app_mention' &&
-        /^<.*?> *debug/.match?(context.message['event']['text'])
+        (context.message['event']['type'] == 'app_mention' && /^<.*?> *debug/.match?(context.message['event']['text']))
       end
 
       def pass_through?(context:)
@@ -40,19 +39,7 @@ module SlackBot
 
       def handle(context:)
 
-        case context.message['event']['type']
-        when 'message'
-
-          message = <<"EOS"
-debug message:
-```
-#{context.message.pretty_inspect}
-```
-EOS
-
-          context.client.chat_postMessage(channel: context.message['event']['channel'], text: message, as_user: true)
-
-        when 'app_mention'
+        if context.message['event']['type'] == 'app_mention' && /^<.*?> *debug/.match?(context.message['event']['text'])
 
           message = <<"EOS"
 config:
@@ -68,10 +55,18 @@ lambda_event:
 #{context.lambda_event.pretty_inspect}
 ```
 EOS
-
           message.gsub!(ENV['API_KEY'], "_MASKED_")
-
           context.client.chat_postMessage(channel: context.message['event']['channel'], text: message, as_user: true, thread_ts:  context.message['event']['thread_ts'] || context.message['event']['ts'])
+
+        else
+
+          message = <<"EOS"
+debug message:
+```
+#{context.message.pretty_inspect}
+```
+EOS
+          context.client.chat_postMessage(channel: context.message['event']['channel'], text: message, as_user: true)
         end
       end
     end
