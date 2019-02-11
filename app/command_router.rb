@@ -59,7 +59,7 @@ module SlackBot
 
       def accept_message(context)
         now = Time.now
-        expire_at = now.to_i + 60 * 60
+        expire_at = now.to_i + 600
         item = {
           'item_key' => "#{item_key_prefix(context)}:accept",
           'created_at' => now.to_s,
