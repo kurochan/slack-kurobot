@@ -8,6 +8,16 @@ module SlackBot
       def initialize()
       end
 
+      def help(context:)
+        user_id = /^(<.*>) */.match(context.message['event']['text'])[1]
+        <<"EOS"
+debug:
+  debug slack event
+  usage:
+    #{user_id} debug
+EOS
+      end
+
       def can_handle?(context:)
         context.config.enabled_commands.find {|command| command.name == 'debug' }.debug_all_event ||
         (context.message['event']['type'] == 'app_mention' && /^<.*?> *debug/.match?(context.message['event']['text'])) ||

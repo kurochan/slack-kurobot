@@ -11,6 +11,19 @@ module SlackBot
       def initialize()
       end
 
+      def help(context:)
+        user_id = /^(<.*>) */.match(context.message['event']['text'])[1]
+        <<"EOS"
+util:
+  util command
+  usage:
+    #{user_id} ping
+    #{user_id} whoami
+    #{user_id} user
+    #{user_id} channel
+EOS
+      end
+
       def can_handle?(context:)
 
         if context.message['event']['type'] == 'app_mention'

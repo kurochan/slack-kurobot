@@ -5,6 +5,10 @@ module SlackBot
       def initialize()
       end
 
+      def help(context:)
+        ["#{self.class.name}: not implemented!"]
+      end
+
       def can_handle?(context:)
 
         context.logger.warn("#{self.class.name}#can_handle?: This command is NOT implemented!")
