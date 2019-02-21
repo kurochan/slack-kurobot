@@ -7,12 +7,12 @@ module SlackBot
   module Command
     class Router
 
-      COMMAND_RELATIVE_PATH = '../commands'
+      COMMAND_RELATIVE_PATHS = ['../commands', '../../ext/commands']
 
       @@commands = nil
 
       def initialize(commands: nil)
-        @@commands ||= commands || init_commands
+        @@commands ||= commands || COMMAND_RELATIVE_PATHS.map {|path| init_commands(path) }.inject({}){|a, b| a.merge(b) }
       end
 
       def handle(context:)
@@ -85,8 +85,8 @@ module SlackBot
       end
       private :get_allowed_command_configs
 
-      def init_commands
-        command_base_path = File.expand_path(COMMAND_RELATIVE_PATH, __FILE__)
+      def init_commands(base_path)
+        command_base_path = File.expand_path(base_path, __FILE__)
         command_paths = Dir.glob("#{command_base_path}/*/")
         commands = command_paths.map do |path|
           if File.exists?("#{path}/command.rb")
