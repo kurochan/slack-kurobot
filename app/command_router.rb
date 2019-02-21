@@ -92,7 +92,7 @@ module SlackBot
           if File.exists?("#{path}/command.rb")
             require_relative "#{path}/command"
             command_name = File.basename(path)
-            [command_name, Object.const_get("SlackBot::Command::#{command_name.capitalize}").new]
+            [command_name, Object.const_get("SlackBot::Command::#{to_camel(command_name)}").new]
           else
             nil
           end
@@ -100,6 +100,11 @@ module SlackBot
         commands.select {|c| !c.nil? }.to_h
       end
       private :init_commands
+
+      def to_camel(str)
+        str.split("_").map{|w| w[0] = w[0].upcase; w}.join
+      end
+      private :to_camel
     end
   end
 end
