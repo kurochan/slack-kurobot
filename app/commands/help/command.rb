@@ -25,7 +25,7 @@ EOS
       def handle(context:)
         helps = context.allowed_commands.map {|name, command| command.help(context: context) }
         message = "```#{helps.join("\n")}```"
-        context.client.chat_postMessage(channel: context.message['event']['channel'], text: message, as_user: true)
+        context.client.chat_postMessage(channel: context.message['event']['channel'], text: message, as_user: true, thread_ts:  context.message['event']['thread_ts'] || context.message['event']['ts'])
       end
     end
   end

@@ -29,6 +29,7 @@ module SlackBot
         context.logger.debug("AllowedCommands: #{context.allowed_commands.keys}")
 
         context.allowed_commands.each do |name, command|
+          context.command_config = context.config.enabled_commands.find {|command| command.name == name }
           if command.can_handle?(context: context)
             context.logger.debug("handle: #{name}")
             command.handle(context: context)
