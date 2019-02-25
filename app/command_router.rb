@@ -44,9 +44,8 @@ module SlackBot
       private :item_key_prefix
 
       def validate_message(context)
-        return false if context.message['authed_users'].include?(context.message['event']['user']) ||
-                        context.message['event']['user'].nil? ||
-                        context.message['event']['user'].empty?
+        return false if context.message['authed_users'].include?(context.message['event']['user'])
+        return false if context.message['event']['user'].nil? && context.message['event']['bot_id'].nil?
 
         item = context.dynamodb.get_item(key: {'item_key' => "#{item_key_prefix(context)}:accept"})[:item]
         if item
