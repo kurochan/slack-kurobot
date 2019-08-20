@@ -71,7 +71,7 @@ module SlackBot
 
       def get_allowed_command_configs(context)
         commands = context.config.enabled_commands.map do |command|
-          if (command.allowed_user.nil? || scommand.allowed_users.include?('all') || command.allowed_users.include?(context.message['event']['user'])) &&
+          if (command.allowed_user.nil? || command.allowed_users.include?('all') || command.allowed_users.include?(context.message['event']['user'])) &&
              (command.allowed_channels.nil? || command.allowed_channels.include?('all') || command.allowed_channels.include?(context.message['event']['channel'])) &&
              (command.denied_users.nil? || !command.denied_users.include?('all') || !command.denied_users.include?(context.message['event']['user'])) &&
              (command.denied_channels.nil? || !command.denied_channels.include?('all') || !command.denied_channels.include?(context.message['event']['channel']))
